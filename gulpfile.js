@@ -92,7 +92,7 @@ gulp.task('watch-assets', ['copyAssets'], function () {
 
 gulp.task('watchers', ['browser-sync'], function () {
   gulp.watch(paths.pages, ['watch-html'])
-  gulp.watch(paths.scripts, ['watch-ts'])
+  gulp.watch(['src/app/*.ts', 'src/app/**/*.ts'], ['watch-ts'])
   gulp.watch(paths.styles, ['sass'])
   gulp.watch(paths.assets, ['watch-assets'])
 })

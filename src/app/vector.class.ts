@@ -36,8 +36,7 @@ export class Vector {
   }
 
   get magnitude() {
-    return Math.abs(this.x) + Math.abs(this.y)
-    // return Math.sqrt(this.x * this.x + this.y * this.y)
+    return Math.sqrt(this.x * this.x + this.y * this.y)
   }
 
   copy() {

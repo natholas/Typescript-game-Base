@@ -2,14 +2,16 @@ import { Vector } from './vector.class';
 import { GameObject } from './game-object.class';
   
 export class Camera {
-  private offset: Vector = new Vector(0,0)
+  private offset: Vector = new Vector()
+  public target: Vector = new Vector()
   private canvas: HTMLCanvasElement
-  public zoomTarget: number = 0.5
-  public zoom: number = 0.5
+  public zoomTarget: number = 0.02
+  public zoom: number = 0.02
   private keys: any = {}
   private speed: number = 20
   public focus: GameObject
   public focusableObjects: GameObject[] = []
+  public centerMode: boolean = true
   pi: number = Math.PI
 
   constructor(canvas: HTMLCanvasElement) {
@@ -27,13 +29,15 @@ export class Camera {
   private switchFocus() {
     let index
     if (this.focus !== undefined) {
+      this.focus.selected = false
       index = this.focusableObjects.indexOf(this.focus) + 1
       if (index >= this.focusableObjects.length) index = undefined
-    } else {
-      index = 0
+    } else index = 0
+    if (index !== undefined) {
+      this.focus = this.focusableObjects[index]
+      this.focus.selected = true
     }
-     if (index !== undefined) this.focus = this.focusableObjects[index]
-     else this.focus = undefined
+    else this.focus = undefined
   }
 
   private keyDown(e: KeyboardEvent) {
@@ -52,12 +56,21 @@ export class Camera {
   update() {
     this.processCameraMovement()
     this.zoomLerp()
+    this.movementLerp()
+  }
+
+  private movementLerp() {
+    let diffX = this.offset.x - this.target.x
+    let diffY = this.offset.y - this.target.y
+
+    this.offset.x -= diffX / 500
+    this.offset.y -= diffY / 500
   }
 
   private zoomLerp() {
     if (this.zoomTarget) {
       let diff = this.zoomTarget - this.zoom
-      this.zoom += diff / 10
+      this.zoom += diff / 4
     }
   }
 

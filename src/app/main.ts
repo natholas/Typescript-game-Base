@@ -7,23 +7,21 @@ const canvas = new Canvas()
 const gravity = new Gravity()
 const data = new Data()
 
-canvas.addGameObjects([
-  new GameObject(new Vector(-1000, 0), new Vector(0, 500), 100, 100, 'yellow'),
-  new GameObject(new Vector(1000, 0), new Vector(0, -500), 100, 100, 'yellow'),
-  new GameObject(new Vector(50, 0), new Vector(0, -50), 10, 10, 'yellow'),
-  new GameObject(new Vector(-50, 0), new Vector(0, 50), 10, 10, 'yellow'),
-])
+for (let i = 0; i < 120; i++) canvas.spawnRandom()
 
-for (let i = 0; i < 1000; i++) canvas.spawnRandom()
+// canvas.addGameObjects([new GameObject(new Vector(), new Vector(100,-100), 5000000, 'white')])
 
+let i = 0
 const loop = function() {
   gravity.applyGravity(canvas.gameObjects)
-  gravity.applyExplosions(canvas.gameObjects)
-  canvas.camera.focusableObjects = canvas.gameObjects
-  // if (canvas.gameObjects.length < 20) {
-  //   gravity.predict(canvas.gameObjects, 250)
-  // }
+  canvas.camera.target = gravity.findCenter(canvas.gameObjects)
+  let newStars = gravity.processCritical(canvas.gameObjects)
+  if (newStars.length) canvas.addGameObjects(newStars)
+  gravity.removeExploded(canvas.gameObjects)
+  // if (i % 2 == 0) gravity.predict(canvas.gameObjects, 100)
+  
   canvas.render()
+  i ++
 }
 
-setInterval(loop, 1000 / 30)
+setInterval(loop, 1000 / 60)

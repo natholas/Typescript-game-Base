@@ -32,14 +32,9 @@ export class Canvas {
 
   public render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    
+    this.camera.update()
     for (let obj of this.gameObjects) {
       obj.update()
-    }
-
-    this.camera.update()
-
-    for (let obj of this.gameObjects) {
       obj.sprite.render(obj, this.ctx, this.camera)
     }
   }
@@ -55,24 +50,15 @@ export class Canvas {
   }
 
   spawnRandom() {
-    const randomPosOffset = 100000;
-    const randomInertiaOffset = 14000;
-    const maxMass = 500;
+    const randomPosOffset = 100000
+    const randomInertiaOffset = 2000
+    const maxMass = 50000
 
-    let parentIndex = Math.floor(Math.random() * this.gameObjects.length)
-    let parent = this.gameObjects[parentIndex]
-
-    let _pos = parent.pos.add(new Vector(this.rand() * randomPosOffset, this.rand() * randomPosOffset))
-    let _inertia = parent.inertia.add(new Vector(this.rand() * randomInertiaOffset, this.rand() * randomInertiaOffset))
+    let _pos = new Vector(this.rand() * randomPosOffset, this.rand() * randomPosOffset)
+    let _inertia = new Vector(this.rand() * randomInertiaOffset, this.rand() * randomInertiaOffset)
     let _mass = Math.random() * maxMass
 
-    let newObject = new GameObject(
-      _pos,
-      _inertia,
-      _mass,
-      _mass,
-      'red'
-    )
+    let newObject = new GameObject(_pos, _inertia, _mass, 'white')
 
     this.addGameObjects([newObject])
   }

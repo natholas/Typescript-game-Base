@@ -1,5 +1,5 @@
 import { Vector } from './vector.class'
-import { Sprite } from './sprite.class'
+import { BallRenderer } from './ball-renderer.class'
 
 export class GameObject {
   mass: number
@@ -9,24 +9,23 @@ export class GameObject {
   predictions: Vector[] = []
   inertia: Vector
   size: number
-  sprite: Sprite = new Sprite()
-  trailLength: number = 200
+  sprite: BallRenderer = new BallRenderer()
+  trailLength: number = 60
   exploded: boolean = false
-  selected: boolean = false
+  toBeRemoved: boolean = false
   invinsible: boolean = false
-  trailColor: string = this.randomColor()
   
-  constructor(pos: Vector = new Vector(), inertia: Vector = new Vector(), mass: number = 100, color: string, selected: boolean = false) {
-    this.color = color
+  constructor(pos: Vector = new Vector(), inertia: Vector = new Vector(), mass: number = 100, color: string = '') {
+    this.color = color ? color : this.randomColor()
+    this.color = this.randomizeColor(this.color)
     this.pos = pos
     this.inertia = inertia
     this.mass = mass
     this.calcSize()
-    this.selected = selected
   }
 
   copy() {
-    return new GameObject(this.pos.copy(), this.inertia.copy(), this.mass, this.color, this.selected)
+    return new GameObject(this.pos.copy(), this.inertia.copy(), this.mass, this.color)
   }
 
   update() {
@@ -35,7 +34,7 @@ export class GameObject {
   }
 
   calcSize() {
-    this.size = Math.cbrt(this.mass * Math.PI) * 6
+    this.size = Math.cbrt(this.mass * Math.PI) * 10
   }
 
   markInvinsible(duration: number) {
@@ -50,5 +49,22 @@ export class GameObject {
     let g = Math.floor(Math.random() * 255)
     let b = Math.floor(Math.random() * 255)
     return 'rgba(' + r + ',' + g + ',' + b + ',XX)'
+  }
+
+  randomizeColor(color: string) {
+    let _colors = color.substring(5).split(',')
+    let colors = [
+      parseInt(_colors[0]),
+      parseInt(_colors[1]),
+      parseInt(_colors[2])
+    ]
+    
+    for (let i in colors) {
+      colors[i] += Math.random() > 0.5 ? 25 : -25
+      if (colors[i] < 0) colors[i] = 0
+      else if (colors[i] > 255) colors[i] = 255
+    }
+
+    return 'rgba(' + colors[0] + ',' + colors[1] + ',' + colors[2] + ',XX)'
   }
 }

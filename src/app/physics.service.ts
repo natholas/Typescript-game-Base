@@ -1,15 +1,19 @@
 import { Vector } from './vector.class'
-import { GameObject } from './game-object.class';
-import { Explosion } from './explosion.class';
+import { GameObject } from './game-object.class'
+import { AudioService } from './audio.service'
 
-export class Gravity {
-
-  G: number = 0.1
-  criticalMass: number = 1000000
-  minStarMass: number = 30000
-  starCreationForce: number = 35000000
+export class Physics {
+  G: number = 0.07
+  criticalMass: number = 1400000
+  minStarMass: number = 50000
+  starCreationForce: number = 55000000
   speed: number = 1
   mapSize: Vector = new Vector(50000, 80000)
+  audio: any
+
+  constructor(audio: any) {
+    this.audio = audio
+  }
 
   applyGravity(objects: GameObject[]) {
     for (let obj of objects) {
@@ -41,17 +45,19 @@ export class Gravity {
 
   checkColliding(obj: GameObject, _obj: GameObject) {
     if (obj.invinsible || _obj.invinsible) return
+    if (obj.exploded || _obj.exploded) return
     let dist = obj.pos.minus(_obj.pos).magnitude
     let minDist = (obj.size) + (_obj.size)
     if (dist < minDist) {
+      if (obj.mass + _obj.mass > 500000)
+        this.audio.willDoTickNextFrame = true
       if (obj.mass < _obj.mass) {
         obj.exploded = true
         _obj.mass += obj.mass
         _obj.inertia = _obj.inertia.add(obj.inertia.times(obj.mass / _obj.mass))
         obj.mass = 0
         _obj.calcSize()
-      }
-      else {
+      } else {
         _obj.exploded = true
         obj.mass += _obj.mass
         obj.inertia = obj.inertia.add(_obj.inertia.times(_obj.mass / obj.mass))
@@ -61,29 +67,16 @@ export class Gravity {
     }
   }
 
-  predict(objects: GameObject[], count: number) {
-    let _objects: GameObject[] = []
-    for (let obj of objects) {
-      obj.predictions = []
-      let _obj = obj.copy()
-      _objects.push(_obj)
-    }
-
-    for (let i = 0; i < count; i++) {
-      this.applyGravity(_objects)
-      for (let j = 0; j < _objects.length; j++) {
-        if (objects[j].invinsible || objects[j].exploded) continue
-        objects[j].predictions.push(_objects[j].pos)
-        // if (_objects[j].selected) objects[j].predictions.push(_objects[j].pos)
-      }
-    }
-  }
-
   removeExploded(objects: GameObject[]): void {
     for (let i = 0; i < objects.length; i++) {
-      if (objects[i].exploded) {
+      if (objects[i].toBeRemoved) {
         objects.splice(i, 1)
         i --
+      } else if (objects[i].exploded) {
+        let obj = objects[i]
+        setTimeout(a => {
+          obj.toBeRemoved = true
+        }, 4000)
       }
     }
   }
@@ -95,7 +88,6 @@ export class Gravity {
       if (obj.mass > this.criticalMass && !obj.exploded) {
         obj.exploded = true
         let newStarCount = Math.floor(obj.mass / this.minStarMass)
-        // let newStarCount = 2
 
         for (let i = 0; i < newStarCount; i++) {
           let creationForce = this.starCreationForce / this.criticalMass * obj.mass

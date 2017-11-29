@@ -2,7 +2,7 @@ import { GameObject } from './game-object.class'
 import { Vector } from './vector.class';
 import { Camera } from './camera.class';
 
-export class Canvas {
+export class Game {
   canvas: HTMLCanvasElement
   public ctx: CanvasRenderingContext2D
   public gameObjects: GameObject[] = []
@@ -14,7 +14,6 @@ export class Canvas {
     this.ctx = this.canvas.getContext('2d')
     this.camera = new Camera(this.canvas)
     window.addEventListener('resize', this.sizeCanvas.bind(this))
-    document.addEventListener('keyup', this.spawnRandomCheck.bind(this))
     this.sizeCanvas()
   }
 
@@ -58,8 +57,15 @@ export class Canvas {
     let _inertia = new Vector(this.rand() * randomInertiaOffset, this.rand() * randomInertiaOffset)
     let _mass = Math.random() * maxMass
 
-    let newObject = new GameObject(_pos, _inertia, _mass, 'white')
+    let newObject = new GameObject(_pos, _inertia, _mass, this.randomColor())
 
     this.addGameObjects([newObject])
+  }
+
+  randomColor(): string {
+    let r = Math.floor(Math.random() * 255)
+    let g = Math.floor(Math.random() * 255)
+    let b = Math.floor(Math.random() * 255)
+    return 'rgba(' + r + ',' + g + ',' + b + ',XX)'
   }
 }

@@ -3,10 +3,10 @@ import { GameObject } from './game-object.class'
 import { AudioService } from './audio.service'
 
 export class Physics {
-  G: number = 0.07
+  G: number = 0.05
   criticalMass: number = 1400000
   minStarMass: number = 50000
-  starCreationForce: number = 55000000
+  starCreationForce: number = 75000000
   speed: number = 1
   mapSize: Vector = new Vector(50000, 80000)
   audio: any
@@ -72,11 +72,6 @@ export class Physics {
       if (objects[i].toBeRemoved) {
         objects.splice(i, 1)
         i --
-      } else if (objects[i].exploded) {
-        let obj = objects[i]
-        setTimeout(a => {
-          obj.toBeRemoved = true
-        }, 4000)
       }
     }
   }
@@ -95,8 +90,7 @@ export class Physics {
           let _mass = obj.mass / newStarCount
           let _pos = obj.pos.copy().add(new Vector(Math.random() * 1000, Math.random() * 1000))
           let _obj = new GameObject(_pos, _inertia, _mass, obj.color)
-          
-          _obj.markInvinsible(200)
+          _obj.markInvinsible(50)
           newStars.push(_obj)
         }
       }

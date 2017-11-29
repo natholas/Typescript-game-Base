@@ -7,7 +7,7 @@ const audio = new AudioService()
 const game = new Game()
 const physics = new Physics(audio)
 
-for (let i = 0; i < 120; i++) game.spawnRandom()
+for (let i = 0; i < 250; i++) game.spawnRandom()
 
 const loop = function() {
   physics.applyGravity(game.gameObjects)
@@ -19,7 +19,10 @@ const loop = function() {
   }
   if (audio.willDoTickNextFrame) audio.doTick()
   physics.removeExploded(game.gameObjects)
-  game.render()
+  window.requestAnimationFrame(a => {
+    game.render()
+    loop()
+  })
 }
-
-setInterval(loop, 1000 / 60)
+loop()
+// setInterval(loop, 1000 / 60)
